@@ -9,16 +9,19 @@ import ua.kpi.its.lab.rest.svc.CarService
 
 @Service
 class CarServiceImpl(private val carRepository: CarRepository) : CarService {
+    @PreAuthorize("hasAuthority('OWNER')")
     override fun createCar(carRequest: CarRequest): CarResponse {
         val car = Car(brand = carRequest.brand, manufacturer = carRequest.manufacturer)
         return CarResponse.fromEntity(carRepository.save(car))
     }
 
+    @PreAuthorize("hasAuthority(['OWNER', 'GUEST'])")
     override fun getCarById(id: Long): CarResponse {
         val car = carRepository.findById(id).orElseThrow()
         return CarResponse.fromEntity(car)
     }
 
+    @PreAuthorize("hasAuthority('OWNER')")
     override fun updateCarById(id: Long, carRequest: CarRequest): CarResponse {
         val car = carRepository.findById(id).orElseThrow()
         car.brand = carRequest.brand
@@ -27,6 +30,7 @@ class CarServiceImpl(private val carRepository: CarRepository) : CarService {
         return CarResponse.fromEntity(updCar)
     }
 
+    @PreAuthorize("hasAuthority('OWNER')")
     override fun deleteCarById(id: Long): Boolean {
         carRepository.deleteById(id)
         return true

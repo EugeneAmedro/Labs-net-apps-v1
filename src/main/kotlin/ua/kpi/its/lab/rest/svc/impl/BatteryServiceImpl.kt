@@ -8,17 +8,20 @@ import ua.kpi.its.lab.rest.repository.BatteryRepository
 import ua.kpi.its.lab.rest.svc.BatteryService
 @Service
 class BatteryServiceImpl(private val batteryRepository: BatteryRepository) : BatteryService {
+    @PreAuthorize("hasAuthority('OWNER')")
     override fun createBattery(batteryRequest: BatteryRequest): BatteryResponse {
         val battery = Battery(model = batteryRequest.model, manufacturer = batteryRequest.manufacturer)
         val newBattery = batteryRepository.save(battery)
         return BatteryResponse.fromEntity(newBattery)
     }
 
+    @PreAuthorize("hasAuthority(['OWNER', 'GUEST'])")
     override fun getBatteryById(id: Long): BatteryResponse {
         val battery = batteryRepository.findById(id).orElseThrow()
         return BatteryResponse.fromEntity(battery)
     }
 
+    @PreAuthorize("hasAuthority('OWNER')")
     override fun updateBatteryById(id: Long, batteryRequest: BatteryRequest): BatteryResponse {
         val battery = batteryRepository.findById(id).orElseThrow()
         battery.model = batteryRequest.model
@@ -27,6 +30,7 @@ class BatteryServiceImpl(private val batteryRepository: BatteryRepository) : Bat
         return BatteryResponse.fromEntity(updatedBattery)
     }
 
+    @PreAuthorize("hasAuthority('OWNER')")
     override fun deleteBatteryById(id: Long): Boolean {
         batteryRepository.deleteById(id)
         return true

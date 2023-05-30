@@ -1,5 +1,6 @@
 package ua.kpi.its.lab.rest
 
+import jakarta.servlet.DispatcherType
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.eclipse.jetty.server.Server
@@ -9,7 +10,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.web.context.ContextLoaderListener
 import org.springframework.web.context.WebApplicationContext
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext
+import org.springframework.web.filter.DelegatingFilterProxy
 import org.springframework.web.servlet.DispatcherServlet
+import java.util.*
 
 @SpringBootApplication
 class Main
@@ -38,11 +41,13 @@ private val servletContextHandler: ServletContextHandler
         val webAppContext = webApplicationContext
         val dispatcherServlet = DispatcherServlet(webAppContext)
         val springServletHolder = ServletHolder("dispatcherServlet", dispatcherServlet)
+        val filter = DelegatingFilterProxy("springSecurityFilterChain", webAppContext)
         return ServletContextHandler(ServletContextHandler.SESSIONS).apply {
             errorHandler = null
             contextPath = "/"
             addServlet(springServletHolder, "/*")
             addEventListener(ContextLoaderListener(webAppContext))
+            addFilter(FilterHolder(filter), "/*", EnumSet.of(DispatcherType.REQUEST))
         }
     }
 
