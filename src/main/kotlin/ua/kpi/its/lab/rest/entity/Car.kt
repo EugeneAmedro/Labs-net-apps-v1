@@ -19,7 +19,7 @@ data class Car(
     val maxSpeed: Int,
     val price: Int,
     val withABS: Boolean,
-    @OneToMany(mappedBy = "car", cascade = [CascadeType.ALL], orphanRemoval = true)
+    @OneToOne(mappedBy = "car", cascade = [CascadeType.ALL], orphanRemoval = true)
     val battery: Battery,
 ) : Comparable<Car> {
     override fun compareTo(car: Car): Int {
